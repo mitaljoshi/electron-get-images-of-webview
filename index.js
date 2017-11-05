@@ -11,6 +11,7 @@ var https = require('https');           //require js file to download image from
 var fs = require('fs');           //require js file to download Local file
 
 webview.addEventListener("dom-ready", function () {
+    webview.openDevTools();
     webview.send("find-element", {                                                                                         // send selector to webview to get Image URL
         text: selector
     });
@@ -25,7 +26,11 @@ webview.addEventListener('ipc-message', function (event) {                      
     var image = document.createElement("img");
     image.src = event.channel;
     document.getElementsByTagName("body")[0].appendChild(image);
-
+    //image loaded 1
+    //check ing if complete otherwise carry on
+    if(outputObj.products.length > i){
+        loadImg(i++);
+    }
 });
 fileInput.addEventListener('change', function (evt) {
     var file = evt.target.files[0];
@@ -39,19 +44,16 @@ fileInput.addEventListener('change', function (evt) {
                 dynamicTyping: true,
                 complete: function (results) {
                     data = results;
-                    var outputObj = {};
+                    outputObj = {};
                     outputObj.products = data.data;
                     console.log(data.meta.fields);
                     var arr = data.meta.fields;   //JSON object coverted from CSV file
                     if (arr.length == 2 && arr.indexOf("link") >= 0 && arr.indexOf("selector") >= 0) {
-                        console.log(JSON.stringify(outputObj, null, 2));
-                        var i = 0;
-                        var objLength = outputObj.products.length;
-                        for (i = 0; i < objLength; i++) {
-                            webview.loadURL(outputObj.products[i].link);                                              //Set URL to webview
-                            selector = outputObj.products[i].selector;
-                            var isLoaded = webview.isLoading();
-                        }
+                        console.log(JSON.stringify(outputObj, null, 2));                        
+                        var objLength = outputObj.products.length=
+                        //user selected file
+                        i = 0;
+                        loadImg(i);
                     }
                     else {
                         console.log("No data found.");
@@ -64,6 +66,10 @@ fileInput.addEventListener('change', function (evt) {
         }
     }
 });
+function loadImg(arr, cb) {
+    webview.loadURL(outputObj.products[i].link); //Set URL to webview
+    selector = outputObj.products[i].selector;
+}
 folderChooser.addEventListener('change', function (evt) {                                                                                         // Show Choosen folder path
     var folder = evt.target.files[0];
     document.getElementById("folderPathLbl").innerHTML = folder.path;
