@@ -1,5 +1,7 @@
 var request = require('request');           //require js file to write file from URL
 var Papa = require('./papaParse.js');           //require js file to Convert CSV to JSON
+var XLSX = require('xlsx');
+var dialog = require('electron').remote.dialog;
 var imagURL = "";
 var selector = "";
 var webview = document.getElementById("webview");
@@ -30,7 +32,7 @@ webview.addEventListener('ipc-message', function (event) {                      
     document.getElementsByTagName("body")[0].appendChild(image);
     //image loaded 1
     //check ing if complete otherwise carry on
-    if ((outputObj.products.length - 1)  > recordNumner) {
+    if ((outputObj.products.length - 1) > recordNumner) {
         recordNumner = recordNumner + 1;
         loadImg(recordNumner);
     }
@@ -51,13 +53,17 @@ fileInput.addEventListener('change', function (evt) {
                     outputObj.products = data.data;
                     console.log(data.meta.fields);
                     var arr = data.meta.fields;   //JSON object coverted from CSV file
-                    loadImg(recordNumner);                    
+                    loadImg(recordNumner);
                 }
             });
         }
         else {
             alert("Please choose CSV file.");
         }
+        console.log(XLSX.readFile(file.path, { type: 'array' }));
+        wb = XLSX.readFile(file.path);
+        var htmlstr = XLSX.utils.sheet_to_json(wb.Sheets["URLS"]);
+        document.body.innerHTML += htmlstr;
     }
 });
 function loadImg(i, cb) {
@@ -72,9 +78,12 @@ chooseFolderBtn.addEventListener('click', function (e) {                        
     folderChooser.click();
 });
 downloadBtn.addEventListener('click', function (e) {                                                                                         // Generate Image file from received URL and download to Choosen Path
-    var path = document.getElementById("folderPathLbl").innerHTML;
-    var file = fs.createWriteStream(path + "\\image.jpg");
-    var request = https.get(imagURL, function (response) {
-        response.pipe(file);
-    });
+    // var path = document.getElementById("folderPathLbl").innerHTML;
+    // var file = fs.createWriteStream(path + "\\image.jpg");
+    // var request = https.get(imagURL, function (response) {
+    //     response.pipe(file);
+    // });
+
+    var o = dialog.showOpenDialog({ properties: ['openFile'] });
+    var workbook = XLSX.readFile(o[0]);
 });
