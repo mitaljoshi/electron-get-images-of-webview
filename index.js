@@ -9,9 +9,11 @@ var chooseFolderBtn = document.getElementById("chooseFolderBtn");
 var downloadBtn = document.getElementById('downloadBtn');
 var https = require('https');           //require js file to download image from link
 var fs = require('fs');           //require js file to download Local file
+var outputObj = {};
+var recordNumner = 0;
 
 webview.addEventListener("dom-ready", function () {
-    webview.openDevTools();
+    //webview.openDevTools();
     webview.send("find-element", {                                                                                         // send selector to webview to get Image URL
         text: selector
     });
@@ -28,8 +30,9 @@ webview.addEventListener('ipc-message', function (event) {                      
     document.getElementsByTagName("body")[0].appendChild(image);
     //image loaded 1
     //check ing if complete otherwise carry on
-    if(outputObj.products.length > i){
-        loadImg(i++);
+    if ((outputObj.products.length - 1)  > recordNumner) {
+        recordNumner = recordNumner + 1;
+        loadImg(recordNumner);
     }
 });
 fileInput.addEventListener('change', function (evt) {
@@ -44,20 +47,11 @@ fileInput.addEventListener('change', function (evt) {
                 dynamicTyping: true,
                 complete: function (results) {
                     data = results;
-                    outputObj = {};
+                    //outputObj = {};
                     outputObj.products = data.data;
                     console.log(data.meta.fields);
                     var arr = data.meta.fields;   //JSON object coverted from CSV file
-                    if (arr.length == 2 && arr.indexOf("link") >= 0 && arr.indexOf("selector") >= 0) {
-                        console.log(JSON.stringify(outputObj, null, 2));                        
-                        var objLength = outputObj.products.length=
-                        //user selected file
-                        i = 0;
-                        loadImg(i);
-                    }
-                    else {
-                        console.log("No data found.");
-                    }
+                    loadImg(recordNumner);                    
                 }
             });
         }
@@ -66,7 +60,7 @@ fileInput.addEventListener('change', function (evt) {
         }
     }
 });
-function loadImg(arr, cb) {
+function loadImg(i, cb) {
     webview.loadURL(outputObj.products[i].link); //Set URL to webview
     selector = outputObj.products[i].selector;
 }

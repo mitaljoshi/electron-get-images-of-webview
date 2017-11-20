@@ -28,14 +28,14 @@ function createWindow() {
 
   // Open the DevTools.
   //  
-  // mainWindow.webContents.openDevTools();
-//  $("#downloadBtn").on('click',function(){
-//     mainWindow.webContents.downloadURL($(this).href);
-//  });
+  mainWindow.webContents.openDevTools();
+  //  $("#downloadBtn").on('click',function(){
+  //     mainWindow.webContents.downloadURL($(this).href);
+  //  });
   mainWindow.webContents.session.on('will-download', (event, item, webContents) => {
     // Set the save path, making Electron not to prompt a save dialog.
     // item.downloadItem.setSavePath("C:\Users\techbrain\Desktop");
-  
+
     item.on('updated', (event, state) => {
       if (state === 'interrupted') {
         console.log('Download is interrupted but can be resumed')
@@ -55,7 +55,7 @@ function createWindow() {
       }
     })
   })
- // Emitted when the window is closed.
+  // Emitted when the window is closed.
   mainWindow.on('closed', function () {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
